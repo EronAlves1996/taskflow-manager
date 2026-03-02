@@ -17,7 +17,7 @@ export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 100, type: 'string' })
+  @Column({ length: 100, type: 'varchar' })
   title: string;
 
   @Column({ type: 'enum', enum: TaskStatus, enumName: 'task_status' })

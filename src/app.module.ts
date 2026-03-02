@@ -23,7 +23,7 @@ import { Task } from './task/task.entity';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entites: [Task],
+        entities: [Task],
       }),
     }),
   ],
