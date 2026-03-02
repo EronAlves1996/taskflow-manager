@@ -1,9 +1,33 @@
 import { plainToInstance } from 'class-transformer';
-import { IsIn, validateSync } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsNumber,
+  Max,
+  Min,
+  validateSync,
+} from 'class-validator';
 
 class EnvVars {
   @IsIn(['info', 'debug', 'warn', 'error'])
   LOG_LEVEL: string;
+
+  @IsNotEmpty()
+  DB_HOST: string;
+
+  @IsNumber()
+  @Min(0)
+  @Max(65535)
+  DB_PORT: number;
+
+  @IsNotEmpty()
+  DB_USERNAME: string;
+
+  @IsNotEmpty()
+  DB_PASSWORD: string;
+
+  @IsNotEmpty()
+  DB_DATABASE: string;
 }
 
 export function validate(config: Record<string, unknown>) {
