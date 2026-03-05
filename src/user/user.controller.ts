@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -10,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { NewUserDto } from './new-user.dto';
 import { UserService } from './user.service';
+import { getPositiveNumericValue } from 'src/utils';
 
 @Controller('users')
 export class UserController {
@@ -20,28 +20,16 @@ export class UserController {
     return this.service.create(newUser);
   }
 
-  private getNumericValue(value: string | null, paramName: string) {
-    const numericValue = Number(value);
-
-    if (!Number.isFinite(numericValue)) {
-      throw new BadRequestException(`${paramName} must be a number`);
-    }
-
-    if (numericValue <= 0) {
-      throw new BadRequestException(`${paramName} must be a positive number`);
-    }
-
-    return numericValue;
-  }
-
   @Get()
   getAll(@Query('page') page: string | null) {
-    return this.service.getAll(this.getNumericValue(page || '1', 'page'));
+    return this.service.getAll(getPositiveNumericValue(page || '1', 'page'));
   }
 
   @Get('/:id')
   async findById(@Param('id') id: string | null) {
-    const found = await this.service.findById(this.getNumericValue(id, 'id'));
+    const found = await this.service.findById(
+      getPositiveNumericValue(id, 'id'),
+    );
 
     if (!found) {
       throw new NotFoundException();

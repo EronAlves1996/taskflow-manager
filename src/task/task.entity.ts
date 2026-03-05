@@ -35,6 +35,9 @@ export class Task {
   })
   assignee: User;
 
+  @Column({ name: 'assignee_id', nullable: true })
+  assigneeId?: number;
+
   @CreateDateColumn({
     name: 'created_at',
   })
