@@ -36,7 +36,7 @@ export class UserController {
 
   @Get()
   getAll(@Query('page') page: string | null) {
-    return this.service.getAll(this.getNumericValue(page, 'page'));
+    return this.service.getAll(this.getNumericValue(page || '1', 'page'));
   }
 
   @Get('/:id')

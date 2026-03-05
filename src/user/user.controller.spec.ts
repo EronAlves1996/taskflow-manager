@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -37,6 +37,10 @@ describe('UserController', () => {
         const total = inMemoryDataSource.length;
         const sliced = inMemoryDataSource.slice(skip, skip + take);
         return [sliced, total] as const;
+      },
+      find({ where: { id } }: { where: { id: number } }) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return inMemoryDataSource.filter(({ id: uid }) => uid === id);
       },
     };
   };
@@ -121,5 +125,19 @@ describe('UserController', () => {
     expect(resultsPage3.page).toBe(3);
     expect(resultsPage3.pages).toBe(2);
     expect(resultsPage3.data).toHaveLength(0);
+  });
+
+  it('should get a single user correctly', async () => {
+    for (let i = 0; i < 15; i++) {
+      await controller.create({ name: 'Jair das dores' });
+    }
+
+    const user = await controller.findById('4');
+    expect(user.id).toBe(4);
+  });
+
+  it('should throw 404 when no user found', async () => {
+    const test = async () => await controller.findById('4');
+    await expect(test()).rejects.toThrow(NotFoundException);
   });
 });
