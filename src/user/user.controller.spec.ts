@@ -3,7 +3,11 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -42,6 +46,9 @@ describe('UserController', () => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return inMemoryDataSource.filter(({ id: uid }) => uid === id);
       },
+      exists({ where: { name } }: { where: { name: string } }) {
+        return inMemoryDataSource.some(({ name: uname }) => uname === name);
+      },
     };
   };
 
@@ -73,6 +80,14 @@ describe('UserController', () => {
     expect(created.updatedAt).toBeDefined();
   });
 
+  it('should throw if user already exists', async () => {
+    const createDuplicated = async () => {
+      await controller.create({ name: 'Jajajajaj' });
+      await controller.create({ name: 'Jajajajaj' });
+    };
+    await expect(createDuplicated()).rejects.toThrow(ConflictException);
+  });
+
   it('should throw error correctly when trying get user with incorrect pagination', () => {
     expect(() => controller.getAll('q2351531')).toThrow(BadRequestException);
   });
@@ -83,7 +98,7 @@ describe('UserController', () => {
 
   it('should get page one when no pagination information is passed', async () => {
     for (let i = 0; i < 15; i++) {
-      await controller.create({ name: 'Jair das dores' });
+      await controller.create({ name: `Jair das dores${i}` });
     }
     const results = await controller.getAll(null);
 
@@ -98,7 +113,7 @@ describe('UserController', () => {
 
   it('should get pages correctly when information is passed', async () => {
     for (let i = 0; i < 15; i++) {
-      await controller.create({ name: 'Jair das dores' });
+      await controller.create({ name: `Jair das dores${i}` });
     }
     const results = await controller.getAll('1');
 
@@ -129,7 +144,7 @@ describe('UserController', () => {
 
   it('should get a single user correctly', async () => {
     for (let i = 0; i < 15; i++) {
-      await controller.create({ name: 'Jair das dores' });
+      await controller.create({ name: `Jair das dores${i}` });
     }
 
     const user = await controller.findById('4');
