@@ -24,7 +24,7 @@ export class TaskService {
     return plainToInstance(TaskDto, instanceToPlain(savedTask));
   }
 
-  private getUser(id?: number) {
+  private getUser(id?: number | null) {
     if (!id || id <= 0) {
       return;
     }
@@ -44,10 +44,18 @@ export class TaskService {
 
     const [task] = existentTask;
 
-    const user = await this.getUser(taskContent.assignee);
+    if (taskContent.assignee === null) {
+      task.assigneeId = null;
+    }
 
-    if (!user && taskContent.assignee) {
-      throw new BadRequestException("User don't exists");
+    if (taskContent.assignee) {
+      const user = await this.getUser(taskContent.assignee);
+
+      if (!user) {
+        throw new BadRequestException("User don't exists");
+      }
+
+      task.assigneeId = user.id;
     }
 
     if (typeof taskContent.title === 'string') {
@@ -60,10 +68,6 @@ export class TaskService {
 
     if (typeof taskContent.status === 'string') {
       task.status = taskContent.status;
-    }
-
-    if (user) {
-      task.assigneeId = user.id;
     }
 
     const updatedTask = await this.taskRepository.save(task);

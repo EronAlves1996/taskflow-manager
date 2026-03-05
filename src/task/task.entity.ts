@@ -33,10 +33,10 @@ export class Task {
   @JoinColumn({
     name: 'assignee_id',
   })
-  assignee: User;
+  assignee: User | null;
 
   @Column({ name: 'assignee_id', nullable: true })
-  assigneeId?: number;
+  assigneeId?: number | null;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -47,5 +47,5 @@ export class Task {
     name: 'updated_at',
     nullable: true,
   })
-  updatedAt?: Date;
+  updatedAt?: Date | null;
 }

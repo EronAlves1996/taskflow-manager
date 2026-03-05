@@ -5,5 +5,5 @@ import { PartialType } from '@nestjs/swagger';
 export class UpdateTaskRequestDto extends PartialType(BaseTaskDto) {
   @IsNumber()
   @IsOptional()
-  assignee?: number;
+  assignee?: number | null;
 }
