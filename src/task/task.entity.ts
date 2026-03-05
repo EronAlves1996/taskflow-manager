@@ -4,10 +4,13 @@ import {
   TaskStatus,
   type TaskStatusEnum,
 } from 'src/enums';
+import { User } from 'src/user/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,6 +28,12 @@ export class Task {
 
   @Column({ type: 'enum', enum: Priority, enumName: 'priority' })
   priority: PriorityEnum;
+
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
+  @JoinColumn({
+    name: 'assignee_id',
+  })
+  assignee: User;
 
   @CreateDateColumn({
     name: 'created_at',
