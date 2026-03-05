@@ -13,10 +13,8 @@ export class UserService {
   ) {}
 
   create(newUser: NewUserDto) {
-    const createdUser = this.userRepository.create(
-      plainToInstance(User, instanceToPlain(newUser)),
-    );
-
+    const user = this.userRepository.create(newUser);
+    const createdUser = this.userRepository.save(user);
     return plainToInstance(NewUserResponseDto, instanceToPlain(createdUser));
   }
 }

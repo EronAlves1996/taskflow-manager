@@ -16,11 +16,14 @@ export class User {
   @Column({ length: 50, type: 'varchar' })
   name: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    name: 'created_at',
+  })
   createdAt: Date;
 
   @UpdateDateColumn({
     nullable: true,
+    name: 'updated_at',
   })
   updatedAt: Date;
 }
