@@ -45,7 +45,7 @@ describe('TaskModule', () => {
     await app.close();
   });
 
-  const createTask = () => request(app.getHttpServer()).post('/task');
+  const createTask = () => request(app.getHttpServer()).post('/tasks');
 
   it('should create a task under mock correctly', () => {
     const requestBody = {

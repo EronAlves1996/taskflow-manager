@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { NewTaskRequestDto } from './new-task-request.dto';
 import { TaskService } from './task.service';
 
-@Controller('task')
+@Controller('tasks')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
