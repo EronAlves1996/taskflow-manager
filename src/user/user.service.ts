@@ -36,4 +36,19 @@ export class UserService {
       page: page,
     };
   }
+
+  async findById(id: number): Promise<NewUserResponseDto | undefined> {
+    const found = await this.userRepository.find({
+      where: {
+        id,
+      },
+      take: 1,
+    });
+
+    if (found.length === 0) {
+      return;
+    }
+
+    return Object.assign(new NewUserResponseDto(), found[0]);
+  }
 }

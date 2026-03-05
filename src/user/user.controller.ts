@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Query,
 } from '@nestjs/common';
@@ -18,19 +20,33 @@ export class UserController {
     return this.service.create(newUser);
   }
 
+  private getNumericValue(value: string | null, paramName: string) {
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue)) {
+      throw new BadRequestException(`${paramName} must be a number`);
+    }
+
+    if (numericValue <= 0) {
+      throw new BadRequestException(`${paramName} must be a positive number`);
+    }
+
+    return numericValue;
+  }
+
   @Get()
   getAll(@Query('page') page: string | null) {
-    const defaultPage = page || 1;
-    const numericPage = Number(defaultPage);
+    return this.service.getAll(this.getNumericValue(page, 'page'));
+  }
 
-    if (!Number.isFinite(numericPage)) {
-      throw new BadRequestException('Page must be a number');
+  @Get('/:id')
+  async findById(@Param('id') id: string | null) {
+    const found = await this.service.findById(this.getNumericValue(id, 'id'));
+
+    if (!found) {
+      throw new NotFoundException();
     }
 
-    if (numericPage <= 0) {
-      throw new BadRequestException('Page must be a positive number');
-    }
-
-    return this.service.getAll(numericPage);
+    return found;
   }
 }
