@@ -44,9 +44,9 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create correctly a well defined user', () => {
+  it('should create correctly a well defined user', async () => {
     const userName = 'José João';
-    const created = controller.create({ name: userName });
+    const created = await controller.create({ name: userName });
     expect(created.id).toBe(1);
     expect(created.name).toBe(userName);
     expect(created.createdAt).toBeDefined();
