@@ -13,7 +13,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 50, type: 'varchar' })
+  @Column({ length: 50, type: 'varchar', unique: true })
   name: string;
 
   @CreateDateColumn({
