@@ -30,6 +30,10 @@ CREATE SEQUENCE public.task_id_seq
     await queryRunner.query(
       "ALTER TABLE ONLY public.task ALTER COLUMN id SET DEFAULT nextval('public.task_id_seq':: regclass)",
     );
+    await queryRunner.query(`
+ALTER TABLE ONLY public.task
+    ADD CONSTRAINT "PK_fb213f79ee45060ba925ecd576e" PRIMARY KEY (id)
+`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
