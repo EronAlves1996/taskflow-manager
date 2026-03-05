@@ -19,12 +19,16 @@ export class UserController {
   }
 
   @Get()
-  getAll(@Query('page') page: number | null) {
+  getAll(@Query('page') page: string | null) {
     const defaultPage = page || 1;
     const numericPage = Number(defaultPage);
 
     if (!Number.isFinite(numericPage)) {
       throw new BadRequestException('Page must be a number');
+    }
+
+    if (numericPage <= 0) {
+      throw new BadRequestException('Page must be a positive number');
     }
 
     return this.service.getAll(numericPage);

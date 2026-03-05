@@ -3,27 +3,43 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { BadRequestException } from '@nestjs/common';
 
 describe('UserController', () => {
   let controller: UserController;
 
-  let userIds = 1;
-  const userRepositoryMockFactory = () => ({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    save: jest.fn((entity: any) => ({
-      ...entity,
-      id: userIds++,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })),
-    create: (base?: unknown) => {
-      const user = new User();
-      if (!base) {
-        return user;
-      }
-      return Object.assign(user, base);
-    },
-  });
+  const userRepositoryMockFactory = () => {
+    const inMemoryDataSource: any[] = [];
+    let userIds = 1;
+
+    return {
+      save: (entity: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const newEntity = {
+          ...entity,
+          id: userIds++,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        inMemoryDataSource.push(newEntity);
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return newEntity;
+      },
+      create: (base?: unknown) => {
+        const user = new User();
+        if (!base) {
+          return user;
+        }
+        return Object.assign(user, base);
+      },
+      findAndCount({ take, skip }: { take: number; skip: number }) {
+        const total = inMemoryDataSource.length;
+        const sliced = inMemoryDataSource.slice(skip, skip + take);
+        return [sliced, total] as const;
+      },
+    };
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -51,5 +67,59 @@ describe('UserController', () => {
     expect(created.name).toBe(userName);
     expect(created.createdAt).toBeDefined();
     expect(created.updatedAt).toBeDefined();
+  });
+
+  it('should throw error correctly when trying get user with incorrect pagination', () => {
+    expect(() => controller.getAll('q2351531')).toThrow(BadRequestException);
+  });
+
+  it('should throw error correctly when trying get user with incorrect pagination', () => {
+    expect(() => controller.getAll('-5')).toThrow(BadRequestException);
+  });
+
+  it('should get page one when no pagination information is passed', async () => {
+    for (let i = 0; i < 15; i++) {
+      await controller.create({ name: 'Jair das dores' });
+    }
+    const results = await controller.getAll(null);
+
+    expect(results.page).toBe(1);
+    expect(results.pages).toBe(2);
+    expect(results.data).toHaveLength(10);
+
+    for (let i = 1; i <= 10; i++) {
+      expect(results.data[i - 1].id).toBe(i);
+    }
+  });
+
+  it('should get pages correctly when information is passed', async () => {
+    for (let i = 0; i < 15; i++) {
+      await controller.create({ name: 'Jair das dores' });
+    }
+    const results = await controller.getAll('1');
+
+    expect(results.page).toBe(1);
+    expect(results.pages).toBe(2);
+    expect(results.data).toHaveLength(10);
+
+    for (let i = 1; i <= 10; i++) {
+      expect(results.data[i - 1].id).toBe(i);
+    }
+
+    const resultsPage2 = await controller.getAll('2');
+
+    expect(resultsPage2.page).toBe(2);
+    expect(resultsPage2.pages).toBe(2);
+    expect(resultsPage2.data).toHaveLength(5);
+
+    for (let i = 11; i <= 15; i++) {
+      expect(resultsPage2.data[i - 11].id).toBe(i);
+    }
+
+    const resultsPage3 = await controller.getAll('3');
+
+    expect(resultsPage3.page).toBe(3);
+    expect(resultsPage3.pages).toBe(2);
+    expect(resultsPage3.data).toHaveLength(0);
   });
 });
