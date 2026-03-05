@@ -4,7 +4,7 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { NewUserDto } from './new-user.dto';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
-import { NewUserResponseDto } from './new-user-response.dto';
+import { UserDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -21,7 +21,7 @@ export class UserService {
       throw new ConflictException('User name already exists');
     }
     const createdUser = await this.userRepository.save(user);
-    return plainToInstance(NewUserResponseDto, instanceToPlain(createdUser));
+    return plainToInstance(UserDto, instanceToPlain(createdUser));
   }
 
   async getAll(page: number) {
@@ -35,7 +35,7 @@ export class UserService {
 
     return {
       data: result.map((r) => {
-        const response = new NewUserResponseDto();
+        const response = new UserDto();
         return Object.assign(response, r);
       }),
       pages: Math.ceil(total / limit),
@@ -43,7 +43,7 @@ export class UserService {
     };
   }
 
-  async findById(id: number): Promise<NewUserResponseDto | undefined> {
+  async findById(id: number): Promise<UserDto | undefined> {
     const found = await this.userRepository.find({
       where: {
         id,
@@ -55,6 +55,6 @@ export class UserService {
       return;
     }
 
-    return Object.assign(new NewUserResponseDto(), found[0]);
+    return Object.assign(new UserDto(), found[0]);
   }
 }
