@@ -4,6 +4,19 @@ export const mockRepositoryFactory = () => {
 
   return {
     save: (entity: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (entity?.id && inMemoryDataSource.length !== 0) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        const item = inMemoryDataSource.find(({ id }) => id === entity?.id);
+        if (item) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const assigned = Object.assign(item, entity);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          assigned.updatedAt = new Date();
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          return assigned;
+        }
+      }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const newEntity = {
         ...entity,
