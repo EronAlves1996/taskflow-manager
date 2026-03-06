@@ -8,6 +8,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { Repository } from 'typeorm';
 import request from 'supertest';
+import { UserModule } from 'src/user/user.module';
+import { mockRepositoryFactory } from 'src/mock.test';
+import { User } from 'src/user/user.entity';
 
 function taskRepositoryMockFactory() {
   return {
@@ -27,11 +30,15 @@ describe('TaskModule', () => {
   beforeAll(async () => {
     const repositoryToken = getRepositoryToken(Task);
     const module: TestingModule = await Test.createTestingModule({
-      imports: [TaskModule],
+      imports: [TaskModule, UserModule],
     })
       .overrideProvider(repositoryToken)
       .useFactory({
         factory: taskRepositoryMockFactory,
+      })
+      .overrideProvider(getRepositoryToken(User))
+      .useFactory({
+        factory: mockRepositoryFactory,
       })
       .compile();
 

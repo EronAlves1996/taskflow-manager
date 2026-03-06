@@ -8,49 +8,21 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { mockRepositoryFactory } from 'src/mock.test';
 
 describe('UserController', () => {
   let controller: UserController;
 
-  const userRepositoryMockFactory = () => {
-    const inMemoryDataSource: any[] = [];
-    let userIds = 1;
-
-    return {
-      save: (entity: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const newEntity = {
-          ...entity,
-          id: userIds++,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        inMemoryDataSource.push(newEntity);
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return newEntity;
-      },
-      create: (base?: unknown) => {
-        const user = new User();
-        if (!base) {
-          return user;
-        }
-        return Object.assign(user, base);
-      },
-      findAndCount({ take, skip }: { take: number; skip: number }) {
-        const total = inMemoryDataSource.length;
-        const sliced = inMemoryDataSource.slice(skip, skip + take);
-        return [sliced, total] as const;
-      },
-      find({ where: { id } }: { where: { id: number } }) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return inMemoryDataSource.filter(({ id: uid }) => uid === id);
-      },
-      exists({ where: { name } }: { where: { name: string } }) {
-        return inMemoryDataSource.some(({ name: uname }) => uname === name);
-      },
-    };
-  };
+  const userRepositoryMockFactory = () => ({
+    ...mockRepositoryFactory(),
+    create: (base?: unknown) => {
+      const user = new User();
+      if (!base) {
+        return user;
+      }
+      return Object.assign(user, base);
+    },
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
