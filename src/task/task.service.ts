@@ -48,7 +48,8 @@ export class TaskService {
       task.assigneeId = null;
     }
 
-    if (taskContent.assignee) {
+    // loose equality check
+    if (taskContent.assignee != null) {
       const user = await this.getUser(taskContent.assignee);
 
       if (!user) {
@@ -58,15 +59,15 @@ export class TaskService {
       task.assigneeId = user.id;
     }
 
-    if (typeof taskContent.title === 'string') {
+    if (taskContent.title != null) {
       task.title = taskContent.title;
     }
 
-    if (typeof taskContent.priority === 'string') {
+    if (taskContent.priority != null) {
       task.priority = taskContent.priority;
     }
 
-    if (typeof taskContent.status === 'string') {
+    if (taskContent.status != null) {
       task.status = taskContent.status;
     }
 
