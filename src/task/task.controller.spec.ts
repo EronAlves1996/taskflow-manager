@@ -98,7 +98,7 @@ describe('TaskController', () => {
   });
 
   it('should update title', async () => {
-    const { id: taskId, updatedAt } = await createTask();
+    const { id: taskId, updatedAt, createdAt } = await createTask();
     const newTitle = 'Teste 33';
     const response = await controller.update(
       { title: newTitle },
@@ -106,12 +106,13 @@ describe('TaskController', () => {
     );
 
     expect(response.id).toBe(taskId);
+    expect(response.createdAt).toStrictEqual(createdAt);
     expect(response.title).toBe(newTitle);
     expect(response.updatedAt).not.toBe(updatedAt);
   });
 
   it('should update priority', async () => {
-    const { id: taskId, updatedAt } = await createTask();
+    const { id: taskId, updatedAt, createdAt } = await createTask();
     const newPriority: PriorityEnum = 'high';
     const response = await controller.update(
       { priority: newPriority },
@@ -119,12 +120,13 @@ describe('TaskController', () => {
     );
 
     expect(response.id).toBe(taskId);
+    expect(response.createdAt).toStrictEqual(createdAt);
     expect(response.priority).toBe(newPriority);
     expect(response.updatedAt).not.toBe(updatedAt);
   });
 
   it('should update status', async () => {
-    const { id: taskId, updatedAt } = await createTask();
+    const { id: taskId, updatedAt, createdAt } = await createTask();
     const newStatus: TaskStatusEnum = 'completed';
     const response = await controller.update(
       { status: newStatus },
@@ -132,6 +134,7 @@ describe('TaskController', () => {
     );
 
     expect(response.id).toBe(taskId);
+    expect(response.createdAt).toStrictEqual(createdAt);
     expect(response.status).toBe(newStatus);
     expect(response.updatedAt).not.toBe(updatedAt);
   });
