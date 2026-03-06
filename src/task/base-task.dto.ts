@@ -15,4 +15,16 @@ export class BaseTaskDto {
 
   @IsIn(Priority)
   priority: PriorityEnum;
+
+  constructor(props?: {
+    title: string;
+    status: TaskStatusEnum;
+    priority: PriorityEnum;
+  }) {
+    if (props) {
+      this.title = props.title;
+      this.status = props.status;
+      this.priority = props.priority;
+    }
+  }
 }

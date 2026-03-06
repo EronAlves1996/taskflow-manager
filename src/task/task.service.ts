@@ -32,7 +32,10 @@ export class TaskService {
     return this.userService.findById(id);
   }
 
-  async updatePartial(id: number, taskContent: Partial<UpdateTaskRequestDto>) {
+  async updatePartial(
+    id: number,
+    taskContent: Partial<UpdateTaskRequestDto>,
+  ): Promise<TaskDto | undefined> {
     const existentTask = await this.taskRepository.find({
       where: { id },
       take: 1,
@@ -72,6 +75,10 @@ export class TaskService {
     }
 
     const updatedTask = await this.taskRepository.save(task);
-    return Object.assign(new TaskDto(), updatedTask);
+
+    return new TaskDto({
+      ...updatedTask,
+      updatedAt: updatedTask?.updatedAt ?? undefined,
+    });
   }
 }
